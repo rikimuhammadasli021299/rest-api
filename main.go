@@ -52,6 +52,38 @@ func main() {
 	})
 
 	//PUT /cars/:id - update car
+	r.PUT("/cars/:car_id", func(ctx *gin.Context) {
+		id := ctx.Param("car_id")
+
+		var updateCar car
+		if error := ctx.BindJSON(&updateCar); error != nil {
+			return
+		}
+		for i, car := range cars {
+			if car.ID == id {
+				cars[i] = updateCar
+				ctx.IndentedJSON(http.StatusOK, cars[i])
+				return
+			}
+		}
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{
+			"errors": "Car Not Found",
+		})
+	})
+
+	//get /cars/:id ambil satu data
+	r.GET("/cars/:car_id", func(ctx *gin.Context) {
+		id := ctx.Param("car_id")
+		for _, car := range cars {
+			if car.ID == id {
+				ctx.IndentedJSON(http.StatusOK, car)
+				return
+			}
+		}
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{
+			"errors": "Car Not Found",
+		})
+	})
 
 	//DELETE /cars/:id - delete car
 	r.DELETE("/cars/:car_id", func(ctx *gin.Context) {
@@ -65,4 +97,5 @@ func main() {
 		ctx.Status(http.StatusNoContent)
 	})
 	r.Run()
+
 }
